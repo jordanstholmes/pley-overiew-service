@@ -14,12 +14,12 @@ const mysql = require('mysql');
 // });
 
 const pool = mysql.createPool({
-  host: 'db',
-  port: '3306',
+  host: 'localhost',
+  // port: '3306',
   user: 'root',
-  password: 'test',
+  password: '',
   database: 'overview',
-})
+});
 
 
 module.exports = pool;
