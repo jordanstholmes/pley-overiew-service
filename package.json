@@ -1,0 +1,48 @@
+{
+  "name": "",
+  "version": "",
+  "description": "",
+  "author": "",
+  "license": "",
+  "engines": {
+    "node": ">=6.13.0"
+  },
+  "scripts": {
+    "compile": "webpack -d --mode=production",
+    "start": "sleep 60 && node ./database/seed.js && node ./server/index.js",
+    "seed2": "mysql -u root -p test < ./database/schema.sql && node ./database/seed.js",
+    "seed": "node ./database/seed.js",
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.16.4",
+    "mysql": "^2.16.0",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-responsive-modal": "^3.4.0",
+    "styled-components": "^4.0.2",
+    "faker": "^4.1.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.4",
+    "compression-webpack-plugin": "^2.0.0",
+    "enzyme": "^3.7.0",
+    "enzyme-adapter-react-16": "^1.6.0",
+    "eslint": "^5.8.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1",
+    "jest": "^23.6.0",
+    "react-test-renderer": "^16.6.0",
+    "webpack": "^4.23.0",
+    "webpack-cli": "^3.1.2"
+  }
+}
