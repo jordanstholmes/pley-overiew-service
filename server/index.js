@@ -1,9 +1,12 @@
 const express = require('express');
 const path = require('path');
+const morgan = require('morgan');
 const db = require('../database/index.js');
 
 const app = express();
 const PORT = 9001;
+
+app.use(morgan('dev'));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
