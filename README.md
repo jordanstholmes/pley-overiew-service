@@ -1,12 +1,13 @@
-# YumpSf
+# Pley
 
 > A Yelp item page clone.
 
 ## Related Projects
 
-  - https://github.com/YumpSf/popular-dishes-and-full-menu
-  - https://github.com/YumpSf/repo/reservation-hours
-  - https://github.com/YumpSf/repo/Recommended-Reviews-Module
+  - https://github.com/Pley-SDC/Recommended-Reviews-Module
+  - https://github.com/Pley-SDC/popular-dishes-and-full-menu
+  - https://github.com/Pley-SDC/reservation
+  - https://github.com/Pley-SDC/overview
 
 ## Table of Contents
 
@@ -41,4 +42,95 @@ From within the root directory:
 npm install -g webpack
 npm install
 ```
+## Server API
 
+### Get restaurant info
+  * GET /api/restaurants/:identifier
+  * `identifier` can be unique restaurant name or id
+
+### Add restaurant
+  * POST /api/restaurants/
+  * Expects json data in request body in format:
+    ```json
+    {
+      "name": "String",
+      "address": "String",
+      "phone": "String",
+      "website": "String",
+      "googleMap": "String location",
+      "cost": "Number"
+    }
+    ```
+
+### Update restaurant info
+  * PUT /api/restaurant/:identifier
+  * `identifier` can be unique restaurant name or id
+  * Expects json image data in request body in format (include only keys to update):
+    ```json
+    {
+      "name": "String",
+      "address": "String",
+      "phone": "String",
+      "website": "String",
+      "googleMap": "String location",
+      "cost": "Number"
+    }
+    ```
+
+### Delete restaurant
+  * DELETE /api/restaurant/:identifier
+  * `identifier` can be unique restaurant name or id
+
+### Get individual image
+  * GET /api/images/:id
+  * Returns json image data in format:
+    ```json
+    {
+      "user": "String",
+      "image": "image URL",
+      "description": "String",
+      "posted": "YYYY-MM-MM",
+      "googleMap": "String location",
+      "category": "String",
+      "restaurant": "id Number",
+      "cost": "Number"
+    }
+    ```
+
+### Add image to restaurant
+  * POST /api/restaurants/:restaurantId/images/
+  * Expects json image data in request body in format:
+    ```json
+    {
+      "user": "String",
+      "image": "image URL",
+      "description": "String",
+      "posted": "YYYY-MM-MM",
+      "googleMap": "String location",
+      "category": "String",
+      "restaurant": "id Number",
+      "cost": "Number"
+    }
+    ```
+### Update image info
+  * PUT /api/images/:id
+  * Expects json image data in request body in format (include only keys to update):
+    ```json
+    {
+      "user": "String",
+      "image": "image URL",
+      "description": "String",
+      "posted": "YYYY-MM-MM",
+      "googleMap": "String location",
+      "category": "String",
+      "restaurant": "id Number",
+      "cost": "Number"
+    }
+    ```
+### Delete image
+  * DELETE /api/images/:id
+
+### Get restaurant data and data for all images related to restaurant
+  * GET /api/:identifier
+  * `identifier` can be unique restaurant name or id
+  * Returns object with `restaurant` and `images` properties (both contain arrays)

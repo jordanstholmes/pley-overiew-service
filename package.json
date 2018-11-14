@@ -8,9 +8,8 @@
     "node": ">=6.13.0"
   },
   "scripts": {
-    "compile": "webpack -d --mode=development --watch",
+    "compile": "webpack -d --mode=production",
     "start": "sleep 60 && node ./database/seed.js && node ./server/index.js",
-    "jstart": "nodemon ./server/index.js",
     "seed2": "mysql -u root < ./database/schema.sql && node ./database/seed.js",
     "seed": "node ./database/seed.js",
     "test": "jest --coverage"
