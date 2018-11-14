@@ -24,16 +24,22 @@ app.get('/:id', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.get('/api/:id', (req, res) => {
-  const theId = req.params.id;
+app.get('/api/:identifier', (req, res) => {
+  const { identifier } = req.params;
+  const identifierColumn = Number(identifier) ? 'id' : 'name';
+  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
   const data = {};
-
-  db.query(`SELECT * from images WHERE images.restaurant = ${theId}`, (err, result) => {
-    if (err) { throw err; }
-    data.images = result;
-    db.query(`SELECT * from restaurants WHERE id = ${theId}`, (err2, theData) => {
-      if (err2) { throw err2; }
-      data.restaurant = theData;
+  db.query(`SELECT * FROM restaurants WHERE ${identifierColumn}=${searchTerm}`, (err, restaurantData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(404);
+    }
+    data.restaurant = restaurantData;
+    db.query(`SELECT * from images WHERE images.restaurant = ${data.restaurant[0].id}`, (err2, imagesData) => {
+      if (err2) {
+        return console.error(err2);
+      }
+      data.images = imagesData;
       res.send(data);
     });
   });
@@ -45,7 +51,7 @@ app.post('/api/restaurants/', (req, res) => {
   const values = req.body;
   const restaurantVals = `"${values.name}", "${values.address}", "${values.phone}", "${values.website}", "${values.googleMap}", ${values.cost}`;
   // console.log(values);
-  db.query(`INSERT INTO restaurants (${restaurantCols}) VALUES (${restaurantVals});`, (err, results) => {
+  db.query(`INSERT INTO restaurants (${restaurantCols}) VALUES (${restaurantVals});`, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -73,11 +79,12 @@ app.put('/api/restaurants/:identifier', (req, res) => {
   const identifierColumn = Number(identifier) ? 'id' : 'name';
   const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
   const values = req.body;
-  const assignmentList = restaurantCols.split(', ').map((colName) => {
+  const colsToChange = Object.keys(req.body);
+  const assignmentList = colsToChange.map((colName) => {
     const val = colName === 'cost' ? values[colName] : `"${values[colName]}"`;
     return `${colName} = ${val}`;
   }).join(', ');
-  db.query(`UPDATE restaurants SET ${assignmentList} WHERE ${identifierColumn} = ${searchTerm};`, (err, results) => {
+  db.query(`UPDATE restaurants SET ${assignmentList} WHERE ${identifierColumn} = ${searchTerm};`, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -89,11 +96,12 @@ app.put('/api/restaurants/:identifier', (req, res) => {
 
 app.put('/api/images/:id', (req, res) => {
   const values = req.body;
-  const assignmentList = imageCols.split(', ').map((colName) => {
+  const colsToUpdate = Object.keys(values);
+  const assignmentList = colsToUpdate.map((colName) => {
     const val = colName === 'restaurant' ? values[colName] : `"${values[colName]}"`;
     return `${colName} = ${val}`;
   }).join(', ');
-  db.query(`UPDATE images SET ${assignmentList} WHERE id = ${req.params.id};`, (err, results) => {
+  db.query(`UPDATE images SET ${assignmentList} WHERE id = ${req.params.id};`, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -107,7 +115,7 @@ app.delete('/api/restaurants/:identifier', (req, res) => {
   const { identifier } = req.params;
   const column = Number(identifier) ? 'id' : 'name';
   const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  db.query(`DELETE FROM restaurants WHERE ${column}=${searchTerm}`, (err, results) => {
+  db.query(`DELETE FROM restaurants WHERE ${column}=${searchTerm}`, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
