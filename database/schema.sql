@@ -4,17 +4,6 @@ CREATE DATABASE overview;
 
 USE overview;
 
-CREATE TABLE images (
-  id INT NOT NULL AUTO_INCREMENT,
-  user VARCHAR(30),
-  image TEXT,
-  description TEXT,
-  posted DATE,
-  category VARCHAR(30),
-  restaurant INT,
-  PRIMARY KEY (ID)
-);
-
 CREATE TABLE restaurants (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(50),
@@ -24,4 +13,18 @@ CREATE TABLE restaurants (
   googleMap TEXT,
   cost INT,
   PRIMARY KEY (ID)
+);
+
+CREATE TABLE images (
+  id INT NOT NULL AUTO_INCREMENT,
+  user VARCHAR(30),
+  image TEXT,
+  description TEXT,
+  posted DATE,
+  category VARCHAR(30),
+  restaurant INT,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (restaurant)
+    REFERENCES restaurants(id)
+    ON DELETE CASCADE
 );
