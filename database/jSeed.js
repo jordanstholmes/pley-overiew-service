@@ -73,7 +73,6 @@ function createSeedWriter(fileName, total, seedGenerator, cb) {
       totalSeedEntries -= 1;
     }
     if (totalSeedEntries > 0) {
-      console.log((totalSeedEntries * BATCH_SIZE), 'REMAINING');
       stream.once('drain', writer);
     } else if (totalSeedEntries <= 0 && cb) {
       console.log('Switching to images now...');
@@ -83,7 +82,7 @@ function createSeedWriter(fileName, total, seedGenerator, cb) {
   return writer;
 }
 
-const imageWriter = createSeedWriter('images.csv', 1000000, seedImages);
-const restaurantWriter = createSeedWriter('restaurants.csv', 100000, seedRestaurants, imageWriter);
+const imageWriter = createSeedWriter('images.csv', 100000000, seedImages);
+const restaurantWriter = createSeedWriter('restaurants.csv', 10000000, seedRestaurants, imageWriter);
 restaurantWriter();
 // imageWriter();
