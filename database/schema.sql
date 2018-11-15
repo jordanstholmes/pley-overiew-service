@@ -20,7 +20,7 @@ CREATE TABLE images (
   user VARCHAR(30),
   image TEXT,
   description TEXT,
-  posted DATE,
+  posted VARCHAR(255),
   category VARCHAR(30),
   restaurant INT,
   PRIMARY KEY (ID),
@@ -28,3 +28,15 @@ CREATE TABLE images (
     REFERENCES restaurants(id)
     ON DELETE CASCADE
 );
+
+LOAD DATA INFILE '/Users/jordanholmes/Documents/SDC/overview/database/seedFiles/restaurants.csv'
+INTO TABLE restaurants
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+LOAD DATA INFILE '/Users/jordanholmes/Documents/SDC/overview/database/seedFiles/images.csv'
+INTO TABLE images
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
