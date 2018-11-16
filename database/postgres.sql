@@ -1,7 +1,7 @@
 
--- DROP TYPE IF EXISTS picture_category;
+DROP TYPE IF EXISTS picture_category;
 
--- CREATE TYPE picture_category AS ENUM('food', 'drinks');
+CREATE TYPE picture_category AS ENUM('food', 'drinks');
 
 DROP TABLE IF EXISTS images;
 -- DROP TABLE IF EXISTS restaurants;
