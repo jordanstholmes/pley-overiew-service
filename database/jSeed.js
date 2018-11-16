@@ -4,9 +4,11 @@ const path = require('path');
 // const db = require('./index.js');
 let restaurantId = 1;
 let imageId = 1;
-const BATCH_SIZE = 1000;
+const BATCH_SIZE = 1000; // generally set to 1000
+const NUMBER_OF_RESTAURANTS = 10000000;
 const FOODCATEGORIES = ['drinks', 'food'];
 const AVERAGE_IMAGES_PER_RESTAURANT = 10;
+const IMAGE_INDICES_ON_AWS = 900;
 
 const getRandomInt = max => Math.floor(Math.random() * Math.floor(max));
 function padIndex(idx) {
@@ -52,8 +54,8 @@ const seedImages = (numberOfInstances = BATCH_SIZE) => {
     description = faker.lorem.sentences();
     posted = faker.date.recent();
     category = FOODCATEGORIES[getRandomInt(FOODCATEGORIES.length)];
-    restaurant = getRandomInt(BATCH_SIZE) + 1;
-    const paddedImgIdx = padIndex(getRandomInt(900 + 1)); // 1 of 900 images in s3
+    restaurant = getRandomInt(NUMBER_OF_RESTAURANTS) + 1;
+    const paddedImgIdx = padIndex(getRandomInt(IMAGE_INDICES_ON_AWS + 1));
     image = `https://s3-us-west-1.amazonaws.com/sdc-overview-images/images/${paddedImgIdx}.jpeg`;
     csvLines += `"${imageId}","${user}","${image}","${description}","${posted}","${category}","${restaurant}"\n`;
     imageId += 1;
@@ -82,7 +84,7 @@ function createSeedWriter(fileName, total, seedGenerator, cb) {
   return writer;
 }
 
-const imageWriter = createSeedWriter('images.csv', 100000000, seedImages);
-const restaurantWriter = createSeedWriter('restaurants.csv', 10000000, seedRestaurants, imageWriter);
+const imageWriter = createSeedWriter('images.csv', NUMBER_OF_RESTAURANTS * AVERAGE_IMAGES_PER_RESTAURANT, seedImages);
+const restaurantWriter = createSeedWriter('restaurants.csv', NUMBER_OF_RESTAURANTS, seedRestaurants, imageWriter);
 restaurantWriter();
 // imageWriter();

@@ -24,4 +24,6 @@ coverage
 build/
 dist/
 database/seedFiles
+public/bundle.js
+public/bundle.js.gz
 
