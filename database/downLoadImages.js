@@ -2,7 +2,10 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-let index = 1;
+const NUMBER_OF_IMAGES = 900;
+const IMG_WIDTH = 800;
+const IMG_HEIGHT = 450;
+let index = 501;
 
 function padIndex() {
   const zeroCount = 4 - index.toString().length;
@@ -10,16 +13,15 @@ function padIndex() {
 }
 
 async function downloadImage() {
-  const destination = path.resolve(__dirname, `../../images/${padIndex()}.jpeg`);
+  const destination = path.resolve(__dirname, `./seedFiles/images/${padIndex()}.jpeg`);
   index += 1;
 
   const response = await axios({
     method: 'GET',
-    url: 'https://loremflickr.com/220/220/food',
+    url: `https://loremflickr.com/${IMG_WIDTH}/${IMG_HEIGHT}/food`,
     responseType: 'stream',
   });
 
-  if (index === 24) { console.log(response); }
   response.data.pipe(fs.createWriteStream(destination));
 
   return new Promise((resolve, reject) => {
@@ -33,7 +35,7 @@ async function downloadImage() {
   });
 }
 
-function loop(iterations = 900) {
+function loop(iterations = NUMBER_OF_IMAGES) {
   downloadImage().then(() => {
     if (index <= iterations) {
       loop(iterations);

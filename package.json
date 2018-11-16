@@ -8,13 +8,11 @@
     "node": ">=6.13.0"
   },
   "scripts": {
-    "compile": "webpack -d --mode=production",
-    "start": "sleep 60 && node ./database/seed.js && node ./server/index.js",
-    "seed2": "mysql -u root < ./database/schema.sql && node ./database/seed.js",
-    "seed": "node ./database/seed.js",
+    "compile": "webpack -d --watch --mode=development",
+    "start": "nodemon ./server/index.js",
     "write-seed": "node ./database/jSeed.js",
     "test": "jest --coverage",
-    "dlimages": "node ./database/downLoadImages.js"
+    "generate-seed-images": "node ./database/downLoadImages.js"
   },
   "dependencies": {
     "axios": "^0.18.0",

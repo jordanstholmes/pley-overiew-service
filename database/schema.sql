@@ -8,9 +8,9 @@ CREATE TABLE restaurants (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(50),
   address TEXT,
-  phone TEXT,
-  website TEXT,
-  googleMap TEXT,
+  phone VARCHAR(50),
+  website VARCHAR(2083),
+  googleMap VARCHAR(2083),
   cost INT,
   PRIMARY KEY (ID)
 );
@@ -18,10 +18,10 @@ CREATE TABLE restaurants (
 CREATE TABLE images (
   id INT NOT NULL AUTO_INCREMENT,
   user VARCHAR(30),
-  image TEXT,
-  description TEXT,
+  image VARCHAR(2083),
+  description VARCHAR(5000),
   posted VARCHAR(255),
-  category VARCHAR(30),
+  category ENUM('food', 'drinks'),
   restaurant INT,
   PRIMARY KEY (ID),
   FOREIGN KEY (restaurant)
