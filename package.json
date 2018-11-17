@@ -12,7 +12,8 @@
     "start": "nodemon ./server/index.js",
     "write-seed": "node ./database/jSeed.js",
     "test": "jest --coverage",
-    "generate-seed-images": "node ./database/downLoadImages.js"
+    "generate-seed-images": "node ./database/downLoadImages.js",
+    "benchmark": "node ./database/benchmark/postgres.js"
   },
   "dependencies": {
     "axios": "^0.18.0",

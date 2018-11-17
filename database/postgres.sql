@@ -23,8 +23,8 @@ CREATE TABLE images (
   description VARCHAR(5000),
   posted VARCHAR(255),
   category picture_category,
-  restaurant INTEGER,
-  FOREIGN KEY (restaurant)
+  restaurant_id INTEGER,
+  FOREIGN KEY (restaurant_id)
     REFERENCES restaurants(id)
     ON DELETE CASCADE
 );
