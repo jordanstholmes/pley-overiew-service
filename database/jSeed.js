@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 // const db = require('./index.js');
 let restaurantId = 1;
-let imageId = 1;
-const BATCH_SIZE = 1000; // generally set to 1000
+let imageId = 100000000;
+const BATCH_SIZE = 1; // generally set to 1000
 const NUMBER_OF_RESTAURANTS = 10000000;
 const FOODCATEGORIES = ['drinks', 'food'];
 const AVERAGE_IMAGES_PER_RESTAURANT = 10;
@@ -84,7 +84,11 @@ function createSeedWriter(fileName, total, seedGenerator, cb) {
   return writer;
 }
 
-const imageWriter = createSeedWriter('images.csv', NUMBER_OF_RESTAURANTS * AVERAGE_IMAGES_PER_RESTAURANT, seedImages);
+const imageWriter = createSeedWriter('images2.csv', 1, seedImages);
 const restaurantWriter = createSeedWriter('restaurants.csv', NUMBER_OF_RESTAURANTS, seedRestaurants, imageWriter);
-restaurantWriter();
-// imageWriter();
+// restaurantWriter();
+imageWriter();
+
+exports.createSeedWriter = createSeedWriter;
+exports.seedImages = seedImages;
+exports.seedRestaurants = seedRestaurants;

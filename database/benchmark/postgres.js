@@ -1,8 +1,15 @@
 const Sequelize = require('sequelize');
+const fs = require('fs');
+const path = require('path');
 
-const NUMBER_OF_QUERIES = 10;
+const { Op } = Sequelize;
+
+let entriesFromFile;
+let insertIdx = -1;
+const NUMBER_OF_QUERIES = 1000;
 const NANOS_PER_MILLI = 1000000;
 const MAX_IMG_IDX = 100000000;
+let deleteIdx = 10000000;
 
 const sequelize = new Sequelize('overview', 'jordanholmes', 'password', {
   host: 'localhost',
@@ -23,7 +30,11 @@ const Restaurant = sequelize.define('restaurant', {
   cost: Sequelize.INTEGER,
 });
 
-const Image = sequelize.define('images', {
+const Image = sequelize.define('image', {
+  // id: {
+  //   primaryKey: true,
+  //   type: Sequelize.INTEGER,
+  // },
   user_name: Sequelize.STRING(50),
   image: Sequelize.STRING(2083),
   description: Sequelize.STRING(5000),
@@ -39,7 +50,8 @@ function getRandomIdFromEndOfDb(lastIdx) {
   return Math.floor(Math.random() * (maxIdx - minIdx)) + minIdx;
 }
 
-async function getAverageQuerySpeed(numberOfQueries) {
+
+async function getAverageQuerySpeed(numberOfQueries, queryFunc) {
   await sequelize
     .authenticate()
     .then(() => Restaurant.sync())
@@ -48,30 +60,31 @@ async function getAverageQuerySpeed(numberOfQueries) {
     });
   let totalms = 0;
   let totalSeconds = 0;
-  let hrstart = process.hrtime();
+  let loopsDone = 0;
+  let hrstart;
   let hrend;
   let milliseconds;
   let seconds;
 
-  function loop(numOfLoops) {
+  function loop() {
     hrstart = process.hrtime();
-    Image.findAll({
-      where: {
-        id: getRandomIdFromEndOfDb(MAX_IMG_IDX),
-      },
-    })
-      .then(() => {
+    queryFunc()
+      .then((result) => {
         hrend = process.hrtime(hrstart);
         milliseconds = hrend[1] / NANOS_PER_MILLI;
         seconds = hrend[0];
         totalSeconds += seconds;
         totalms += milliseconds;
-        console.log('Tests Remaining:', numOfLoops);
+        loopsDone += 1;
+        console.log(result.length, 'items were returned');
+        console.log('TEST:', loopsDone);
+        console.log('Seconds:', totalSeconds);
         console.log('Milliseconds:', milliseconds);
-        console.log('Seconds should be 0:', totalSeconds);
-        console.log('Average milliseconds:', totalms / (numberOfQueries - numOfLoops));
-        if (numOfLoops > 0) {
-          loop(numOfLoops - 1);
+        console.log('Average milliseconds:', totalms / loopsDone);
+        if (loopsDone < numberOfQueries) {
+          loop();
+        } else {
+          sequelize.close();
         }
       })
       .catch(err => console.error(err));
@@ -79,44 +92,125 @@ async function getAverageQuerySpeed(numberOfQueries) {
   loop(numberOfQueries);
 }
 
-getAverageQuerySpeed(NUMBER_OF_QUERIES);
+function getImages() {
+  const MAX_RESTAURANT_IDX = 10000000;
+  return Image.findAll({
+    where: {
+      restaurant_id: getRandomIdFromEndOfDb(MAX_RESTAURANT_IDX),
+    },
+  });
+}
 
-// let hrstart = process.hrtime();
-// sequelize
-//   .authenticate()
-//   .then(() => Restaurant.sync())
-//   .then(() => {
-//     console.log('Connection established!');
-//     console.log(process.hrtime(hrstart)[1] / 1000000);
-//   })
-//   .then(() => {
-//     hrstart = process.hrtime();
-//     return Image.findAll({
-//       where: {
-//         id: 98999999,
-//       },
-//     });
-//   })
-//   .then((result) => {
-//     const end = process.hrtime(hrstart);
-//     console.log('SECONDS:', end[0], 'MILLISECONDS:', end[1] / 1000000);
-//     console.log('RESULT', result);
-//   });
-//   .then(() => {
-//     hrstart = process.hrtime();
-//     return Restaurant.findAll({
-//       where: {
-//         id: 9999999,
-//         phone: '677-614-0980',
-//         website: 'http://martina.net',
-//         // name: 'Gislason - Osinski',
-//       },
-//     });
-//   })
-//   .then((result) => {
-//     const end = process.hrtime(hrstart);
-//     console.log('SECONDS:', end[0], 'MILLISECONDS:', end[1] / 1000000);
-//     console.log(result);
-//     console.log('Matches:', result.length);
-//   })
-//   .catch(err => console.error('Things did not go to plan...', err));
+function getImage() {
+  return Image.findAll({
+    where: {
+      id: getRandomIdFromEndOfDb(MAX_IMG_IDX),
+    },
+  });
+}
+
+function insertImage() {
+  insertIdx += 1;
+  return Image.create(entriesFromFile[insertIdx]);
+}
+
+function createImageDeleter() {
+  let startIdx = MAX_IMG_IDX - NUMBER_OF_QUERIES;
+  const endIdx = MAX_IMG_IDX;
+
+  return () => {
+    if (startIdx > endIdx) {
+      return console.log('Cannot delete higher than max idx');
+    }
+    startIdx += 1;
+    return Image.destroy({
+      where: {
+        id: startIdx,
+      },
+    });
+  };
+}
+
+function deleteRestaurant() {
+  deleteIdx -= 1;
+  return Restaurant.destroy({
+    where: {
+      id: deleteIdx,
+    },
+  });
+}
+
+async function readImagesFromFile(cb) {
+  fs.readFile(path.resolve(__dirname, 'savedImageRecords.json'), 'utf8', (err, results) => {
+    if (err) return console.error(err);
+    entriesFromFile = JSON.parse(results);
+    return cb();
+  });
+}
+
+function writeLastImagesToFile(numberOfImages) {
+  const startIdx = 100000000 - numberOfImages;
+  Image.findAll({
+    where: {
+      id: {
+        [Op.gt]: startIdx,
+      },
+    },
+  })
+    .then((results) => {
+      const data = results.reduce((acc, { dataValues }) => {
+        acc.push(dataValues);
+        return acc;
+      }, []);
+      fs.writeFile(path.resolve(__dirname, 'savedImageRecords.json'), JSON.stringify(data), (err) => {
+        if (err) {
+          return console.error(err);
+        }
+        return console.log('Images file written');
+      });
+    });
+}
+
+function writeLastRestaurantsToFile(numberOfRecords) {
+  const startIdx = 10000000 - numberOfRecords;
+  Restaurant.findAll({
+    where: {
+      id: {
+        [Op.gt]: startIdx,
+      },
+    },
+  })
+    .then((results) => {
+      const data = results.reduce((acc, { dataValues }) => {
+        acc.push(dataValues);
+        return acc;
+      }, []);
+      fs.writeFile(path.resolve(__dirname, 'savedRestaurantRecords.json'), JSON.stringify(data), (err) => {
+        if (err) {
+          return console.error(err);
+        }
+        return console.log('Images file written');
+      });
+    });
+}
+
+function insertImagesFromFile() {
+  fs.readFile(path.resolve(__dirname, 'savedImageRecords.json'), 'utf8', (err, results) => {
+    if (err) return console.error(err);
+    const data = JSON.parse(results);
+    Image.bulkCreate(data)
+      .then(() => console.log('finished instering from file'))
+      .catch(error => console.error(error));
+  });
+}
+
+// writeLastImagesToFile(1000);
+// getAverageQuerySpeed(NUMBER_OF_QUERIES, createImageDeleter());
+// insertImagesFromFile();
+
+readImagesFromFile(() => {
+  getAverageQuerySpeed(NUMBER_OF_QUERIES, deleteRestaurant);
+});
+
+// writeLastRestaurantsToFile(100);
+
