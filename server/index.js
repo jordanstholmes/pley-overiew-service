@@ -6,14 +6,11 @@ const db = require('../database/mongoDb/index.js');
 require('dotenv').config();
 
 const app = express();
-const restaurantCols = 'name, address, phone, website, googleMap, cost';
-const imageCols = 'user, image, description, posted, category, restaurant';
+const { Restaurant } = db;
 
 app.use(morgan('dev'));
 app.use(cors());
-
 app.use(express.static(path.join(__dirname, '../public/')));
-app.use(express.json());
 app.use(express.urlencoded()); // Why is this here? Isn't it redundant after the previous line?
 
 app.get('/:id', (req, res) => {
@@ -23,7 +20,7 @@ app.get('/:id', (req, res) => {
 // 5bf5bb6bde88b93f5705cdc4
 app.get('/api/:id', (req, res) => {
   const { id } = req.params;
-  db.Restaurant.findById(id, (err, restaurantData) => {
+  Restaurant.findById(id, (err, restaurantData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(404);
