@@ -8,15 +8,19 @@
     "node": ">=6.13.0"
   },
   "scripts": {
+    "setup": "node setup.js",
     "compile": "webpack -d --watch --mode=development",
     "start": "nodemon ./server/index.js",
-    "write-seed": "node ./database/jSeed.js",
-    "test": "jest --coverage",
-    "generate-seed-images": "node ./database/downLoadImages.js",
-    "benchmark": "node ./database/benchmark/postgres.js"
+    "write-seed": "node ./database/seeding/writers/generateDataWriteCSVs.js",
+    "test": "jest",
+    "download-seed-images": "node ./database/downLoadImages.js",
+    "benchmark:postgres": "node ./database/benchmark/postgres.js",
+    "benchmark:mongo": "node ./database/mongoDb/mongoBenchmark.js",
+    "write-seed:json": "node ./database/writeSeedFiles"
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "faker": "^4.1.0",
     "mongodb": "^3.1.10",

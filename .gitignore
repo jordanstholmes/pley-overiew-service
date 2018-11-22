@@ -24,6 +24,10 @@ coverage
 build/
 dist/
 database/seedFiles
+
+# Client Bundles
 public/bundle.js
 public/bundle.js.gz
 
+# Environment files
+.env
