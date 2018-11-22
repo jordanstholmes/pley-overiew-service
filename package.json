@@ -8,21 +8,30 @@
     "node": ">=6.13.0"
   },
   "scripts": {
+    "setup": "node setup.js",
     "compile": "webpack -d --watch --mode=development",
     "start": "nodemon ./server/index.js",
-    "write-seed": "node ./database/jSeed.js",
-    "test": "jest --coverage",
-    "generate-seed-images": "node ./database/downLoadImages.js"
+    "write-seed": "node ./database/seeding/writers/generateDataWriteCSVs.js",
+    "test": "jest",
+    "download-seed-images": "node ./database/downLoadImages.js",
+    "benchmark:postgres": "node ./database/benchmark/postgres.js",
+    "benchmark:mongo": "node ./database/mongoDb/mongoBenchmark.js",
+    "write-seed:json": "node ./database/writeSeedFiles"
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "faker": "^4.1.0",
+    "mongodb": "^3.1.10",
     "morgan": "^1.9.1",
     "mysql": "^2.16.0",
+    "pg": "^7.6.1",
+    "pg-hstore": "^2.3.2",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "react-responsive-modal": "^3.4.0",
+    "sequelize": "^4.41.2",
     "styled-components": "^4.0.2"
   },
   "devDependencies": {

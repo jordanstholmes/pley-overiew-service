@@ -3,12 +3,13 @@ const fs = require('fs');
 const path = require('path');
 
 const NUMBER_OF_IMAGES = 900;
+const MAX_IMG_IDX = 1000;
 const IMG_WIDTH = 800;
 const IMG_HEIGHT = 450;
-let index = 501;
+let index = 1;
 
 function padIndex() {
-  const zeroCount = 4 - index.toString().length;
+  const zeroCount = MAX_IMG_IDX - index.toString().length;
   return Array(zeroCount).fill('0').join('') + index.toString();
 }
 
