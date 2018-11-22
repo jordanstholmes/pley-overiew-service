@@ -1,20 +1,16 @@
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
-const db = require('../database/index.js');
+const cors = require('cors');
+const db = require('../database/mongoDb/index.js');
+require('dotenv').config();
 
 const app = express();
-const PORT = 9001;
 const restaurantCols = 'name, address, phone, website, googleMap, cost';
 const imageCols = 'user, image, description, posted, category, restaurant';
 
 app.use(morgan('dev'));
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
+app.use(cors());
 
 app.use(express.static(path.join(__dirname, '../public/')));
 app.use(express.json());
@@ -24,24 +20,15 @@ app.get('/:id', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.get('/api/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const identifierColumn = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  const data = {};
-  db.query(`SELECT * FROM restaurants WHERE ${identifierColumn}=${searchTerm}`, (err, restaurantData) => {
+// 5bf5bb6bde88b93f5705cdc4
+app.get('/api/:id', (req, res) => {
+  const { id } = req.params;
+  db.Restaurant.findById(id, (err, restaurantData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(404);
     }
-    data.restaurant = restaurantData;
-    db.query(`SELECT * from images WHERE images.restaurant = ${data.restaurant[0].id}`, (err2, imagesData) => {
-      if (err2) {
-        return console.error(err2);
-      }
-      data.images = imagesData;
-      res.send(data);
-    });
+    res.send(restaurantData);
   });
 });
 
@@ -161,4 +148,4 @@ app.get('/api/images/:imageId', (req, res) => {
   });
 });
 
-app.listen(PORT, console.log('Listening on port:', PORT));
+app.listen(process.env.PORT, console.log('Listening on port:', process.env.PORT));

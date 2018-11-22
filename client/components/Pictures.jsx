@@ -187,23 +187,21 @@ class Pictures extends React.Component {
     this.setState({ show: false });
   }
 
-  parseData(data) {
-    const newArray = [];
+  parseData(restaurantData) {
+    let imgURLs = [];
     let costString = '';
-    data.images.forEach((image) => {
-      newArray.push(image.image);
-    });
-    for (let i = 0; i < data.restaurant[0].cost; i += 1) {
+    imgURLs = restaurantData.images.map(imageData => imageData.image);
+    for (let i = 0; i < restaurantData.cost; i += 1) {
       costString += '$';
     }
     this.setState({
-      images: newArray,
+      images: imgURLs,
       restaurant: {
-        address: data.restaurant[0].address,
-        name: data.restaurant[0].name,
-        phone: data.restaurant[0].phone,
-        website: data.restaurant[0].website,
-        googleMap: data.restaurant[0].googleMap,
+        address: restaurantData.address,
+        name: restaurantData.name,
+        phone: restaurantData.phone,
+        website: restaurantData.website,
+        googleMap: restaurantData.googleMap,
         cost: costString,
       },
     });

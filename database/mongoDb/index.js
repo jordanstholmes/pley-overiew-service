@@ -26,7 +26,7 @@ const restaurantSchema = mongoose.Schema({
 });
 
 exports.Restaurant = db.model('restaurant', restaurantSchema);
-exports.Restaurant.findOne({ restaurantId: 2 }, (err, result) => {
-  if (err) return console.error(err);
-  return console.log(result);
-});
+// exports.Restaurant.findOne({ restaurantId: 2 }, (err, result) => {
+//   if (err) return console.error(err);
+//   return console.log(result);
+// });
