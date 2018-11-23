@@ -97,19 +97,17 @@ app.put('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
   });
 });
 
-// app.delete('/api/restaurants/:id', (req, res) => {
-//   const { identifier } = req.params;
-//   const column = Number(identifier) ? 'id' : 'name';
-//   const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-//   db.query(`DELETE FROM restaurants WHERE ${column}=${searchTerm}`, (err) => {
-//     if (err) {
-//       console.error(err);
-//       res.sendStatus(404);
-//     } else {
-//       res.sendStatus(200);
-//     }
-//   });
-// });
+app.delete('/api/restaurants/:restaurantId', (req, res) => {
+  const { restaurantId } = req.params;
+  Restaurant.deleteOne({ restaurantId }, (err) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(404);
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
 
 app.delete('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
   const { restaurantId, imageId } = req.params;
