@@ -134,8 +134,12 @@ app.get('/api/restaurants/:id', (req, res) => {
   });
 });
 
-app.get('/api/images/:imageId', (req, res) => {
-  db.query(`SELECT * FROM images WHERE id=${req.params.imageId}`, (err, results) => {
+app.get('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+  console.log('I got hit');
+  const { restaurantId, imageId } = req.params;
+  const documentSelector = { restaurantId };
+  const imageMatcher = { images: { $elemMatch: { imageId } } };
+  Restaurant.findOne(documentSelector, imageMatcher, (err, results) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
