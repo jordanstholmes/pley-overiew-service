@@ -54,10 +54,10 @@ app.post('/api/restaurants/', (req, res) => {
   });
 });
 
-app.post('/api/restaurants/:restaurantId/images/', (req, res) => {
+app.post('/api/restaurants/:id/images/', (req, res) => {
+  const { id } = req.params;
   const image = req.body;
-  const imageValues = `"${image.user}", "${image.image}", "${image.description}", "${image.posted}", "${image.category}", ${req.params.restaurantId}`;
-  db.query(`INSERT INTO images (${imageCols}) VALUES (${imageValues});`, (err, results) => {
+  Restaurant.findOneAndUpdate({ restaurantId: id }, { $push: { images: image } }, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
