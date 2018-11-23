@@ -111,16 +111,19 @@ app.put('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
 //   });
 // });
 
-// app.delete('/api/images/:id', (req, res) => {
-//   db.query(`DELETE FROM images WHERE id =${req.params.id}`, (err, results) => {
-//     if (err) {
-//       console.error(err);
-//       res.sendStatus(404);
-//     } else {
-//       res.sendStatus(200);
-//     }
-//   });
-// });
+app.delete('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+  const { restaurantId, imageId } = req.params;
+  const documentSelector = { restaurantId };
+  const imageMatcher = { $pull: { images: { imageId } } };
+  Restaurant.update(documentSelector, imageMatcher, (err) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(404);
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
 
 app.get('/api/restaurants/:id', (req, res) => {
   const { id } = req.params;
