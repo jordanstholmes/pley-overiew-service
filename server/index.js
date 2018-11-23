@@ -67,17 +67,9 @@ app.post('/api/restaurants/:id/images/', (req, res) => {
   });
 });
 
-app.put('/api/restaurants/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const identifierColumn = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  const values = req.body;
-  const colsToChange = Object.keys(req.body);
-  const assignmentList = colsToChange.map((colName) => {
-    const val = colName === 'cost' ? values[colName] : `"${values[colName]}"`;
-    return `${colName} = ${val}`;
-  }).join(', ');
-  db.query(`UPDATE restaurants SET ${assignmentList} WHERE ${identifierColumn} = ${searchTerm};`, (err) => {
+app.put('/api/restaurants/:id', (req, res) => {
+  const { id } = req.params;
+  Restaurant.findOneAndUpdate({ restaurantId: id }, req.body, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
