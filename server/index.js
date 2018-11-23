@@ -97,36 +97,34 @@ app.put('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
   });
 });
 
-app.delete('/api/restaurants/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const column = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  db.query(`DELETE FROM restaurants WHERE ${column}=${searchTerm}`, (err) => {
-    if (err) {
-      console.error(err);
-      res.sendStatus(404);
-    } else {
-      res.sendStatus(200);
-    }
-  });
-});
+// app.delete('/api/restaurants/:id', (req, res) => {
+//   const { identifier } = req.params;
+//   const column = Number(identifier) ? 'id' : 'name';
+//   const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
+//   db.query(`DELETE FROM restaurants WHERE ${column}=${searchTerm}`, (err) => {
+//     if (err) {
+//       console.error(err);
+//       res.sendStatus(404);
+//     } else {
+//       res.sendStatus(200);
+//     }
+//   });
+// });
 
-app.delete('/api/images/:id', (req, res) => {
-  db.query(`DELETE FROM images WHERE id =${req.params.id}`, (err, results) => {
-    if (err) {
-      console.error(err);
-      res.sendStatus(404);
-    } else {
-      res.sendStatus(200);
-    }
-  });
-});
+// app.delete('/api/images/:id', (req, res) => {
+//   db.query(`DELETE FROM images WHERE id =${req.params.id}`, (err, results) => {
+//     if (err) {
+//       console.error(err);
+//       res.sendStatus(404);
+//     } else {
+//       res.sendStatus(200);
+//     }
+//   });
+// });
 
-app.get('/api/restaurants/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const column = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  db.query(`SELECT * FROM restaurants WHERE ${column}=${searchTerm}`, (err, results) => {
+app.get('/api/restaurants/:id', (req, res) => {
+  const { id } = req.params;
+  Restaurant.findOne({ restaurantId: id }, (err, results) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
