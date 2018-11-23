@@ -113,7 +113,7 @@ npm install
     }
     ```
 ### Update image info
-  * PUT /api/images/:id
+  * PUT /api/restaurants/:restaurantId/:imageId
   * Expects json image data in request body in format (include only keys to update):
     ```json
     {

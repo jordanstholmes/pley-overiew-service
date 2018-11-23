@@ -79,14 +79,15 @@ app.put('/api/restaurants/:id', (req, res) => {
   });
 });
 
-app.put('/api/images/:id', (req, res) => {
-  const values = req.body;
-  const colsToUpdate = Object.keys(values);
-  const assignmentList = colsToUpdate.map((colName) => {
-    const val = colName === 'restaurant' ? values[colName] : `"${values[colName]}"`;
-    return `${colName} = ${val}`;
-  }).join(', ');
-  db.query(`UPDATE images SET ${assignmentList} WHERE id = ${req.params.id};`, (err) => {
+app.put('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+  const { restaurantId, imageId } = req.params;
+  const newImageData = req.body;
+  const querySelector = { restaurantId, 'images.imageId': imageId };
+  const updates = Object.keys(newImageData).reduce((acc, key) => {
+    acc[`images.$.${key}`] = newImageData[key];
+    return acc;
+  }, {});
+  Restaurant.findOneAndUpdate(querySelector, updates, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
