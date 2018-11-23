@@ -2,40 +2,49 @@ const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const db = require('../database/mongoDb/index.js');
 require('dotenv').config();
+
 
 const app = express();
 const { Restaurant } = db;
 
 app.use(morgan('dev'));
 app.use(cors());
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public/')));
-app.use(express.urlencoded()); // Why is this here? Isn't it redundant after the previous line?
 
 app.get('/:id', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// 5bf5bb6bde88b93f5705cdc4
 app.get('/api/:id', (req, res) => {
   const { id } = req.params;
-  Restaurant.findById(id, (err, restaurantData) => {
+  Restaurant.findOne({ restaurantId: id }, (err, restaurantData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(404);
     }
-    res.send(restaurantData);
+    return res.send(restaurantData);
   });
 });
 
 /* NEW API ROUTES BELOW */
 
+// const imageSchema = mongoose.Schema({
+//   imageId: Number,
+//   userName: String,
+//   image: String,
+//   description: String,
+//   posted: Date,
+//   category: String,
+// });
+
 app.post('/api/restaurants/', (req, res) => {
-  const values = req.body;
-  const restaurantVals = `"${values.name}", "${values.address}", "${values.phone}", "${values.website}", "${values.googleMap}", ${values.cost}`;
-  // console.log(values);
-  db.query(`INSERT INTO restaurants (${restaurantCols}) VALUES (${restaurantVals});`, (err) => {
+  const restaurantData = req.body;
+  console.log(restaurantData);
+  Restaurant.create(restaurantData, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
