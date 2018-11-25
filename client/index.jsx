@@ -4,4 +4,4 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 
 
-ReactDOM.render(<App />, document.getElementById('overview'));
+ReactDOM.hydrate(<App />, document.getElementById('overview'));
