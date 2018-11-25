@@ -24,4 +24,4 @@ scenarios:
             description: "{{ descript }}"
             posted: "{{ date }}"
             category: "{{ cat }}"
-      count: 50
+      count: 100
