@@ -9,7 +9,8 @@
   },
   "scripts": {
     "setup": "node setup.js",
-    "compile": "webpack -d --watch --mode=development",
+    "compile:dev": "webpack -d --watch --mode=development",
+    "compile:prod": "webpack -p",
     "start": "nodemon ./server/index.js",
     "write-seed": "node ./database/seeding/writers/generateDataWriteCSVs.js",
     "test": "jest",
@@ -29,6 +30,7 @@
     "mongoose": "^5.3.13",
     "morgan": "^1.9.1",
     "mysql": "^2.16.0",
+    "newrelic": "^4.11.0",
     "pg": "^7.6.1",
     "pg-hstore": "^2.3.2",
     "react": "^16.6.0",

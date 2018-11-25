@@ -1,0 +1,16 @@
+config:
+  target: 'http://localhost:9001'
+  phases:
+    - duration: 60
+      arrivalRate: 20
+  payload:
+    path: 'restaurantIds.csv'
+    fields:
+      - 'restaurantId'
+scenarios:
+  - flow:
+    - loop:
+      - get:
+          url: '/api/restaurants/{{ restaurantId }}'
+          # url: '/api/restaurants/{{ $randomNumber(9000000, 10000000) }}'
+      count: 50
