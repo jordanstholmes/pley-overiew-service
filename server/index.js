@@ -1,57 +1,50 @@
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
-const db = require('../database/index.js');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const db = require('../database/mongoDb/index.js');
+require('dotenv').config();
+
 
 const app = express();
-const PORT = 9001;
-const restaurantCols = 'name, address, phone, website, googleMap, cost';
-const imageCols = 'user, image, description, posted, category, restaurant';
+const { Restaurant } = db;
 
 app.use(morgan('dev'));
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
-
+app.use(cors());
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public/')));
-app.use(express.json());
-app.use(express.urlencoded()); // Why is this here? Isn't it redundant after the previous line?
 
 app.get('/:id', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.get('/api/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const identifierColumn = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  const data = {};
-  db.query(`SELECT * FROM restaurants WHERE ${identifierColumn}=${searchTerm}`, (err, restaurantData) => {
+app.get('/api/:id', (req, res) => {
+  const { id } = req.params;
+  Restaurant.findOne({ restaurantId: id }, (err, restaurantData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(404);
     }
-    data.restaurant = restaurantData;
-    db.query(`SELECT * from images WHERE images.restaurant = ${data.restaurant[0].id}`, (err2, imagesData) => {
-      if (err2) {
-        return console.error(err2);
-      }
-      data.images = imagesData;
-      res.send(data);
-    });
+    return res.send(restaurantData);
   });
 });
 
 /* NEW API ROUTES BELOW */
 
+// const imageSchema = mongoose.Schema({
+//   imageId: Number,
+//   userName: String,
+//   image: String,
+//   description: String,
+//   posted: Date,
+//   category: String,
+// });
+
 app.post('/api/restaurants/', (req, res) => {
-  const values = req.body;
-  const restaurantVals = `"${values.name}", "${values.address}", "${values.phone}", "${values.website}", "${values.googleMap}", ${values.cost}`;
-  // console.log(values);
-  db.query(`INSERT INTO restaurants (${restaurantCols}) VALUES (${restaurantVals});`, (err) => {
+  const restaurantData = req.body;
+  console.log(restaurantData);
+  Restaurant.create(restaurantData, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -61,10 +54,10 @@ app.post('/api/restaurants/', (req, res) => {
   });
 });
 
-app.post('/api/restaurants/:restaurantId/images/', (req, res) => {
+app.post('/api/restaurants/:id/images/', (req, res) => {
+  const { id } = req.params;
   const image = req.body;
-  const imageValues = `"${image.user}", "${image.image}", "${image.description}", "${image.posted}", "${image.category}", ${req.params.restaurantId}`;
-  db.query(`INSERT INTO images (${imageCols}) VALUES (${imageValues});`, (err, results) => {
+  Restaurant.findOneAndUpdate({ restaurantId: id }, { $push: { images: image } }, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -74,17 +67,9 @@ app.post('/api/restaurants/:restaurantId/images/', (req, res) => {
   });
 });
 
-app.put('/api/restaurants/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const identifierColumn = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  const values = req.body;
-  const colsToChange = Object.keys(req.body);
-  const assignmentList = colsToChange.map((colName) => {
-    const val = colName === 'cost' ? values[colName] : `"${values[colName]}"`;
-    return `${colName} = ${val}`;
-  }).join(', ');
-  db.query(`UPDATE restaurants SET ${assignmentList} WHERE ${identifierColumn} = ${searchTerm};`, (err) => {
+app.put('/api/restaurants/:id', (req, res) => {
+  const { id } = req.params;
+  Restaurant.findOneAndUpdate({ restaurantId: id }, req.body, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -94,14 +79,15 @@ app.put('/api/restaurants/:identifier', (req, res) => {
   });
 });
 
-app.put('/api/images/:id', (req, res) => {
-  const values = req.body;
-  const colsToUpdate = Object.keys(values);
-  const assignmentList = colsToUpdate.map((colName) => {
-    const val = colName === 'restaurant' ? values[colName] : `"${values[colName]}"`;
-    return `${colName} = ${val}`;
-  }).join(', ');
-  db.query(`UPDATE images SET ${assignmentList} WHERE id = ${req.params.id};`, (err) => {
+app.put('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+  const { restaurantId, imageId } = req.params;
+  const newImageData = req.body;
+  const querySelector = { restaurantId, 'images.imageId': imageId };
+  const updates = Object.keys(newImageData).reduce((acc, key) => {
+    acc[`images.$.${key}`] = newImageData[key];
+    return acc;
+  }, {});
+  Restaurant.findOneAndUpdate(querySelector, updates, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -111,11 +97,9 @@ app.put('/api/images/:id', (req, res) => {
   });
 });
 
-app.delete('/api/restaurants/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const column = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  db.query(`DELETE FROM restaurants WHERE ${column}=${searchTerm}`, (err) => {
+app.delete('/api/restaurants/:restaurantId', (req, res) => {
+  const { restaurantId } = req.params;
+  Restaurant.deleteOne({ restaurantId }, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
@@ -125,8 +109,11 @@ app.delete('/api/restaurants/:identifier', (req, res) => {
   });
 });
 
-app.delete('/api/images/:id', (req, res) => {
-  db.query(`DELETE FROM images WHERE id =${req.params.id}`, (err, results) => {
+app.delete('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+  const { restaurantId, imageId } = req.params;
+  const documentSelector = { restaurantId };
+  const imageMatcher = { $pull: { images: { imageId } } };
+  Restaurant.update(documentSelector, imageMatcher, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
@@ -136,11 +123,9 @@ app.delete('/api/images/:id', (req, res) => {
   });
 });
 
-app.get('/api/restaurants/:identifier', (req, res) => {
-  const { identifier } = req.params;
-  const column = Number(identifier) ? 'id' : 'name';
-  const searchTerm = Number(identifier) ? identifier : `"${identifier}"`;
-  db.query(`SELECT * FROM restaurants WHERE ${column}=${searchTerm}`, (err, results) => {
+app.get('/api/restaurants/:id', (req, res) => {
+  const { id } = req.params;
+  Restaurant.findOne({ restaurantId: id }, (err, results) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
@@ -150,8 +135,12 @@ app.get('/api/restaurants/:identifier', (req, res) => {
   });
 });
 
-app.get('/api/images/:imageId', (req, res) => {
-  db.query(`SELECT * FROM images WHERE id=${req.params.imageId}`, (err, results) => {
+app.get('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+  console.log('I got hit');
+  const { restaurantId, imageId } = req.params;
+  const documentSelector = { restaurantId };
+  const imageMatcher = { images: { $elemMatch: { imageId } } };
+  Restaurant.findOne(documentSelector, imageMatcher, (err, results) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
@@ -161,4 +150,4 @@ app.get('/api/images/:imageId', (req, res) => {
   });
 });
 
-app.listen(PORT, console.log('Listening on port:', PORT));
+app.listen(process.env.PORT, console.log('Listening on port:', process.env.PORT));
