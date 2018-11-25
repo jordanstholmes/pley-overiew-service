@@ -36,17 +36,6 @@ app.get('/api/:id', (req, res) => {
   });
 });
 
-/* NEW API ROUTES BELOW */
-
-// const imageSchema = mongoose.Schema({
-//   imageId: Number,
-//   userName: String,
-//   image: String,
-//   description: String,
-//   posted: Date,
-//   category: String,
-// });
-
 app.post('/api/restaurants/', (req, res) => {
   const restaurantData = req.body;
   console.log(restaurantData);
