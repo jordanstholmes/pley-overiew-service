@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-mongoose.connect(`${process.env.DB_URL}/overview`);
+mongoose.connect(`${process.env.DB_URL}/overview`, {
+  useNewUrlParser: true,
+  poolSize: 5,
+});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 

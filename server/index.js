@@ -1,19 +1,25 @@
+require('newrelic');
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('../database/mongoDb/index.js');
-require('dotenv').config();
 
 
 const app = express();
 const { Restaurant } = db;
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public/')));
+app.get('*.js', (req, res, next) => {
+  req.url += '.gz';
+  res.set('Content-Encoding', 'gzip');
+  next();
+});
 
 app.get('/:id', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
