@@ -9,9 +9,8 @@
   },
   "scripts": {
     "setup": "node setup.js",
-    "compile:dev": "webpack -d --watch --mode=development",
-    "compile:prod": "webpack -p",
-    "start": "nodemon ./server/index.js",
+    "dev": "webpack -d --watch --mode=development & nodemon ./server/index.js",
+    "start": "webpack -p & node ./server/index.js",
     "write-seed": "node ./database/seeding/writers/generateDataWriteCSVs.js",
     "test": "jest",
     "download-seed-images": "node ./database/downLoadImages.js",
