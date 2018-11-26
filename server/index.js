@@ -1,4 +1,4 @@
-require('newrelic');
+// require('newrelic');
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -25,7 +25,7 @@ app.get('/:id', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.get('/api/:id', (req, res) => {
+app.get('/overview/:id', (req, res) => {
   const { id } = req.params;
   Restaurant.findOne({ restaurantId: id }, (err, restaurantData) => {
     if (err) {
@@ -36,7 +36,7 @@ app.get('/api/:id', (req, res) => {
   });
 });
 
-app.post('/api/restaurants/', (req, res) => {
+app.post('/overview/restaurants/', (req, res) => {
   const restaurantData = req.body;
   console.log(restaurantData);
   Restaurant.create(restaurantData, (err) => {
@@ -49,10 +49,10 @@ app.post('/api/restaurants/', (req, res) => {
   });
 });
 
-app.post('/api/restaurants/:id/images/', (req, res) => {
-  const { id } = req.params;
+app.post('/overview/restaurants/:restaurantId/images/', (req, res) => {
+  const { restaurantId } = req.params;
   const image = req.body;
-  Restaurant.findOneAndUpdate({ restaurantId: id }, { $push: { images: image } }, (err) => {
+  Restaurant.findOneAndUpdate({ restaurantId }, { $push: { images: image } }, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -62,9 +62,9 @@ app.post('/api/restaurants/:id/images/', (req, res) => {
   });
 });
 
-app.put('/api/restaurants/:id', (req, res) => {
-  const { id } = req.params;
-  Restaurant.findOneAndUpdate({ restaurantId: id }, req.body, (err) => {
+app.put('/overview/restaurants/:restaurantId', (req, res) => {
+  const { restaurantId } = req.params;
+  Restaurant.findOneAndUpdate({ restaurantId }, req.body, (err) => {
     if (err) {
       console.error(err);
       res.sendStatus(500);
@@ -74,7 +74,7 @@ app.put('/api/restaurants/:id', (req, res) => {
   });
 });
 
-app.put('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+app.put('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => {
   const { restaurantId, imageId } = req.params;
   const newImageData = req.body;
   const querySelector = { restaurantId, 'images.imageId': imageId };
@@ -92,7 +92,7 @@ app.put('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
   });
 });
 
-app.delete('/api/restaurants/:restaurantId', (req, res) => {
+app.delete('/overview/restaurants/:restaurantId', (req, res) => {
   const { restaurantId } = req.params;
   Restaurant.deleteOne({ restaurantId }, (err) => {
     if (err) {
@@ -104,7 +104,7 @@ app.delete('/api/restaurants/:restaurantId', (req, res) => {
   });
 });
 
-app.delete('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+app.delete('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => {
   const { restaurantId, imageId } = req.params;
   const documentSelector = { restaurantId };
   const imageMatcher = { $pull: { images: { imageId } } };
@@ -118,9 +118,9 @@ app.delete('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
   });
 });
 
-app.get('/api/restaurants/:id', (req, res) => {
-  const { id } = req.params;
-  Restaurant.findOne({ restaurantId: id }, (err, results) => {
+app.get('/overview/restaurants/:restaurantId', (req, res) => {
+  const { restaurantId } = req.params;
+  Restaurant.findOne({ restaurantId }, (err, results) => {
     if (err) {
       console.error(err);
       res.sendStatus(404);
@@ -130,7 +130,7 @@ app.get('/api/restaurants/:id', (req, res) => {
   });
 });
 
-app.get('/api/restaurants/:restaurantId/images/:imageId', (req, res) => {
+app.get('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => {
   console.log('I got hit');
   const { restaurantId, imageId } = req.params;
   const documentSelector = { restaurantId };

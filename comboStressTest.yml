@@ -1,9 +1,8 @@
 config:
   target: 'http://localhost:1000'
-  # target: 'http://localhost:9001'
   phases:
     - duration: 60
-      arrivalRate: 10
+      arrivalRate: 20
   payload:
     path: 'postImageData.csv'
     fields:
@@ -25,4 +24,6 @@ scenarios:
             description: "{{ descript }}"
             posted: "{{ date }}"
             category: "{{ cat }}"
-      count: 40
+      - get:
+          url: '/overview/restaurants/{{ $randomNumber(9000000, 10000000) }}'
+      count: 100
