@@ -35,3 +35,4 @@ public/bundle.js.gz
 
 # Environment files
 .env
+.vscode
