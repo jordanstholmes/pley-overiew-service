@@ -1,4 +1,4 @@
-require('newrelic');
+// require('newrelic');
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -12,10 +12,10 @@ const { Restaurant } = db;
 const PORT = process.env.PORT || 9001;
 
 const app = express();
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'production') {
+  app.use(morgan('short'));
 } else {
-  app.use(morgan());
+  app.use(morgan('dev'));
 }
 
 app.use(compression());
