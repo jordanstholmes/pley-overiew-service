@@ -1,5 +1,5 @@
 exports.imageSettings = {
-  imagesPerRestaurant: 10,
+  imagesPerRestaurant: 5,
   csvMode: false,
   maxRestaurantIdx: 10000000,
   totalImgsOnS3: 900,

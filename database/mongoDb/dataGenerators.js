@@ -15,7 +15,7 @@ const padIndex = (idx, desiredLength = 4) => {
   const zeroCount = desiredLength - idx.toString().length;
   return Array(zeroCount).fill('0').join('') + idx.toString();
 };
-const imageIncrementer = createIdIncrementer(1);
+const imageIncrementer = createIdIncrementer(34610001);
 const generateUserName = () => faker.name.findName();
 const generateDescription = () => faker.lorem.sentences();
 const generatePostedDate = () => faker.date.recent();
@@ -26,7 +26,7 @@ const generateImageUrl = (totalImgsOnS3) => {
 };
 
 exports.generateImages = () => {
-  const { imagesPerRestaurant, totalImgsOnS3, categories  } = imageSettings;
+  const { imagesPerRestaurant, totalImgsOnS3, categories } = imageSettings;
   const imagesArr = [];
 
   for (let j = 0; j < imagesPerRestaurant; j += 1) {
@@ -43,7 +43,7 @@ exports.generateImages = () => {
   return imagesArr;
 };
 
-const restaurantIncrementer = createIdIncrementer(1);
+const restaurantIncrementer = createIdIncrementer(6922001);
 const generateRestaurantName = () => faker.company.companyName();
 const generateAddress = () => [
   faker.address.streetAddress(),
@@ -69,7 +69,7 @@ exports.generateRestaurant = () => {
     googleMap: generateGoogleMapImg(maxGoogleMapIdx),
     images: exports.generateImages(),
   };
-  return restaurantObj();
+  return restaurantObj;
 };
 
 exports.getRandomInt = getRandomInt;

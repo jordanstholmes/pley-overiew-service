@@ -7,6 +7,7 @@ mongoose.connect(`${process.env.DB_URL}/overview`, {
 });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => console.log('Connected to mongo!'));
 
 const imageSchema = mongoose.Schema({
   imageId: Number,
@@ -29,6 +30,7 @@ const restaurantSchema = mongoose.Schema({
 });
 
 exports.Restaurant = db.model('restaurant', restaurantSchema);
+
 // exports.Restaurant.findOne({ restaurantId: 5 }, (err, result) => {
 //   if (err) return console.error(err);
 //   return console.log(result);
