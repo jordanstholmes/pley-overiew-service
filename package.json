@@ -11,12 +11,7 @@
     "setup": "node setup.js",
     "dev": "webpack -d --watch --mode=development & nodemon ./server/index.js",
     "start": "webpack -p & NODE_ENV=production node ./server/index.js",
-    "write-seed": "node ./database/seeding/writers/generateDataWriteCSVs.js",
-    "test": "jest",
-    "download-seed-images": "node ./database/downLoadImages.js",
-    "benchmark:postgres": "node ./database/benchmark/postgres.js",
-    "benchmark:mongo": "node ./database/mongoDb/mongoBenchmark.js",
-    "write-seed:json": "node ./database/writeSeedFiles"
+    "test": "jest"
   },
   "dependencies": {
     "axios": "^0.18.0",
