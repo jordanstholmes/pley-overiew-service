@@ -1,15 +1,30 @@
-// require('newrelic');
+require('newrelic');
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const compression = require('compression');
+const redis = require('redis');
 // const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('../database/mongoDb/index.js');
 
+const redisClient = redis.createClient();
+redisClient.on('error', err => console.log('redis error', err));
 
 const app = express();
+app.use(compression());
 const { Restaurant } = db;
+
+const checkRedis = id => new Promise((resolve, reject) => {
+  redisClient.get(id, (error, result) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(result);
+    }
+  });
+});
 
 // app.use(morgan('dev'));
 app.use(cors());
@@ -64,6 +79,7 @@ app.post('/overview/restaurants/:restaurantId/images/', (req, res) => {
 
 app.put('/overview/restaurants/:restaurantId', (req, res) => {
   const { restaurantId } = req.params;
+
   Restaurant.findOneAndUpdate({ restaurantId }, req.body, (err) => {
     if (err) {
       console.error(err);
@@ -120,14 +136,22 @@ app.delete('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => 
 
 app.get('/overview/restaurants/:restaurantId', (req, res) => {
   const { restaurantId } = req.params;
-  Restaurant.findOne({ restaurantId }, (err, results) => {
-    if (err) {
-      console.error(err);
-      res.sendStatus(404);
-    } else {
-      res.send(results);
-    }
-  });
+  checkRedis(restaurantId)
+    .then((cachedResults) => {
+      if (cachedResults) {
+        res.send(JSON.parse(cachedResults));
+      } else {
+        Restaurant.findOne({ restaurantId }, (err, results) => {
+          if (err) {
+            console.error(err);
+            res.sendStatus(404);
+          } else {
+            res.send(results);
+            redisClient.setex(restaurantId, 3600, JSON.stringify(results));
+          }
+        });
+      }
+    });
 });
 
 app.get('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => {
