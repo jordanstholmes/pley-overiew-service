@@ -3,30 +3,22 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const compression = require('compression');
-const redis = require('redis');
-// const morgan = require('morgan');
+const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('../database/mongoDb/index.js');
 
-const redisClient = redis.createClient();
-redisClient.on('error', err => console.log('redis error', err));
+const { Restaurant } = db;
+const PORT = process.env.PORT || 9001;
 
 const app = express();
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan());
+}
+
 app.use(compression());
-const { Restaurant } = db;
-
-const checkRedis = id => new Promise((resolve, reject) => {
-  redisClient.get(id, (error, result) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(result);
-    }
-  });
-});
-
-// app.use(morgan('dev'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public/')));
@@ -136,22 +128,14 @@ app.delete('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => 
 
 app.get('/overview/restaurants/:restaurantId', (req, res) => {
   const { restaurantId } = req.params;
-  checkRedis(restaurantId)
-    .then((cachedResults) => {
-      if (cachedResults) {
-        res.send(JSON.parse(cachedResults));
-      } else {
-        Restaurant.findOne({ restaurantId }, (err, results) => {
-          if (err) {
-            console.error(err);
-            res.sendStatus(404);
-          } else {
-            res.send(results);
-            redisClient.setex(restaurantId, 3600, JSON.stringify(results));
-          }
-        });
-      }
-    });
+  Restaurant.findOne({ restaurantId }, (err, results) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(404);
+    } else {
+      res.send(results);
+    }
+  });
 });
 
 app.get('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => {
@@ -169,4 +153,4 @@ app.get('/overview/restaurants/:restaurantId/images/:imageId', (req, res) => {
   });
 });
 
-app.listen(process.env.PORT, console.log('Listening on port:', process.env.PORT));
+app.listen(PORT, console.log('Listening on port:', PORT));
