@@ -27,6 +27,7 @@ newrelic.js
 build/
 dist/
 database/seedFiles
+dump.rdb
 
 # Client Bundles
 public/bundle.js
