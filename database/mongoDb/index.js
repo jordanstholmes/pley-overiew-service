@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-mongoose.connect(`${process.env.DB_URL}/overview`, {
+const mongoURL = process.env.DB_URL || 'mongodb://localhost:27017';
+
+mongoose.connect(`${mongoURL}/overview`, {
   useNewUrlParser: true,
   poolSize: 5,
 });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => console.log('Connected to mongo!'));
+db.once('open', () => console.log('Connected to mongo at', mongoURL));
 
 const imageSchema = mongoose.Schema({
   imageId: Number,
