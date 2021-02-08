@@ -1,15 +1,17 @@
 {
-  "name": "",
+  "name": "pley-overview-service",
   "version": "",
-  "description": "",
-  "author": "",
+  "description": "Overview service for Pley, review-sharing web app",
+  "author": "jordanstholmes",
   "license": "",
   "engines": {
     "node": ">=6.13.0"
   },
   "scripts": {
     "setup": "node setup.js",
-    "dev": "webpack -d --watch --mode=development & nodemon ./server/index.js",
+    "build:dev": "webpack -d --watch",
+    "start:dev": "nodemon ./server/index.js",
+    "seed": "node ./database/mongoDb/seedMongoDirectly.js",
     "start": "webpack -p & NODE_ENV=production node ./server/index.js",
     "test": "jest"
   },
@@ -19,6 +21,7 @@
     "compression": "^1.7.3",
     "cors": "^2.8.5",
     "dotenv": "^6.1.0",
+    "dotenv-webpack": "^6.0.0",
     "express": "^4.16.4",
     "faker": "^4.1.0",
     "mongodb": "^3.1.10",
@@ -49,6 +52,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.11.1",
     "jest": "^23.6.0",
+    "nodemon": "^2.0.7",
     "react-test-renderer": "^16.6.0",
     "webpack": "^4.23.0",
     "webpack-cli": "^3.1.2"

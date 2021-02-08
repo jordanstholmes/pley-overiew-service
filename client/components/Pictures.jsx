@@ -125,7 +125,7 @@ const AddressWrapper = styled.div`
 
 class Pictures extends React.Component {
   static fetchData(id, callback) {
-    axios.get(`${process.env.OVERVIEW_URL}/overview/restaurants/${id}`)
+    axios.get(`/overview/restaurants/${id}`)
       .then((response) => {
         callback(response.data);
       });
@@ -159,7 +159,10 @@ class Pictures extends React.Component {
 
   componentDidMount() {
     let id = window.location.pathname.slice(1);
-    if (!id) id = Math.floor(Math.random() * 10000000 + 1);
+    if (!id) {
+      id = 6922020;
+    }
+    // if (!id) id = Math.floor(Math.random() * 100 + 1);
     Pictures.fetchData(id, (data) => {
       this.parseData(data);
     });

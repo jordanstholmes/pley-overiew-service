@@ -45,7 +45,7 @@ const insertRestaurantRecords = (collection, numberToInsert) => {
 initializeMongoConnection()
 // 6,922,000
   .then(({ collection }) => {
-    synchronousLoop(insertRestaurantRecords, [collection, 1000], 3078, seconds => (
+    synchronousLoop(insertRestaurantRecords, [collection, 1000], 100, seconds => (
       console.log(`done in ${seconds / 60} minutes`)
     ));
   })
